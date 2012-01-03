@@ -1,0 +1,30 @@
+AOSP IceCreamSandwich port for the Commtiva z71
+
+What's working:
+-Nothing is all.
+
+How to patch fix & BUILDING INSTRUCTIONS
+- git clone git://github.com/pjsports/ICS4.0-FIX.git
+- Then copy&replace file to AOSP Directory (Replace file not Folder)
+- git clone git://github.com/pjsports/android_device_commtiva_z71.git /ICS_WORKING_DIRECTORY/device/commtiva/z71
+- git clone git://github.com/pjsports/proprietary_vendor_commtiva.git /ICS_WORKING_DIRECTORY/vendor/commtiva/z71/proprietary
+- Make build With following command
+$ . build/envsetup.sh
+$ lunch
+$ commtiva_z71-eng
+$ make -j`grep 'processor' /proc/cpuinfo | wc -l` otapackage
+
+- will make a xxx.zip & system.img in /ICS_WORKING_DIRECTORY/out/target/product/commtiva/z71
+- You can flash xxx.zip ROM with Clockworkmod Recovery
+- Follow instructions here to build : http://source.android.com/source/building.html
+
+Video ICS4.0 on WellcoM A88 (Commtiva z71 clone)
+- http://droidsans.com/node/44734
+
+Many thanks to :
+
+-t0mm13b @ http://android.modaco.com/topic/348898-dev-aosp-dev-for-zte-blade
+-rmcc @ https://github.com/rmcc
+-dastin1015 @ http://forum.xda-developers.com/showthread.php?t=1354865
+
+
