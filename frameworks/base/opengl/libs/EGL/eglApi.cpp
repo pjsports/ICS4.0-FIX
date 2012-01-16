@@ -69,6 +69,10 @@ static const extention_map_t sExtentionMap[] = {
             (__eglMustCastToProperFunctionPointerType)&eglGetSystemTimeFrequencyNV },
     { "eglGetSystemTimeNV",
             (__eglMustCastToProperFunctionPointerType)&eglGetSystemTimeNV },
+#ifdef QCOM_HARDWARE
+    { "eglGetRenderBufferANDROID",
+            (__eglMustCastToProperFunctionPointerType)&eglGetRenderBufferANDROID },
+#endif
 };
 
 // accesses protected by sExtensionMapMutex
@@ -938,7 +942,12 @@ EGLBoolean eglSwapBuffers(EGLDisplay dpy, EGLSurface draw)
         return setError(EGL_BAD_SURFACE, EGL_FALSE);
 
     egl_surface_t const * const s = get_surface(draw);
+#ifdef MISSING_EGL_EXTERNAL_IMAGE
+    s->cnx->egl.eglSwapBuffers(dp->disp[s->impl].dpy, s->surface);
+    return EGL_TRUE;
+#else
     return s->cnx->egl.eglSwapBuffers(dp->disp[s->impl].dpy, s->surface);
+#endif
 }
 
 EGLBoolean eglCopyBuffers(  EGLDisplay dpy, EGLSurface surface,
@@ -1443,6 +1452,26 @@ EGLBoolean eglGetSyncAttribKHR(EGLDisplay dpy, EGLSyncKHR sync, EGLint attribute
 // ----------------------------------------------------------------------------
 
 /* ANDROID extensions entry-point go here */
+
+#ifdef QCOM_HARDWARE
+EGLClientBuffer eglGetRenderBufferANDROID(EGLDisplay dpy, EGLSurface draw)
+{
+    clearError();
+
+    egl_display_t const * const dp = validate_display(dpy);
+    if (!dp) return EGL_FALSE;
+
+    SurfaceRef _s(dp, draw);
+    if (!_s.get()) return setError(EGL_BAD_SURFACE, (EGLClientBuffer*)0);
+
+    egl_surface_t const * const s = get_surface(draw);
+    if (s->cnx->egl.eglGetRenderBufferANDROID) {
+        return s->cnx->egl.eglGetRenderBufferANDROID(
+                dp->disp[s->impl].dpy, s->surface);
+    }
+    return setError(EGL_BAD_DISPLAY, (EGLClientBuffer*)0);
+}
+#endif
 
 // ----------------------------------------------------------------------------
 // NVIDIA extensions
